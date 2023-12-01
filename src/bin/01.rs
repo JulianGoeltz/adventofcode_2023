@@ -5,7 +5,7 @@ fn main() {
      * Dummy
      *************************/
     let file_path = "inputs/01_dummy.txt";
-    let tmp = 
+    let tmp =
         sum_vector(
             select_digits_to_create_numbers(
                 get_digits(file_path)));
@@ -15,20 +15,20 @@ fn main() {
      * First Input
      *************************/
     let file_path = "inputs/01_first.txt";
-    let tmp = 
-        sum_vector(
-            select_digits_to_create_numbers(
-                get_digits(file_path)));
-    println!("First Input: The sum of the numbers is {tmp}");
-    /*************************
-     * Second dummy
-     *************************/
-    let file_path = "inputs/01_dummy2.txt";
-    let tmp = 
+    let tmp =
         sum_vector(
             select_digits_to_create_numbers(
                 get_digits_also_alphabetical(file_path)));
-    println!("First Input: The sum of the numbers is {tmp}");
+    println!("second dummy: The sum of the numbers is {tmp}");
+    /*************************
+     * Second part with old input
+     *************************/
+    let file_path = "inputs/01_first.txt";
+    let tmp =
+        sum_vector(
+            select_digits_to_create_numbers(
+                get_digits_also_alphabetical(file_path)));
+    println!("Input with other rules: The sum of the numbers is {tmp}");
 }
 
 fn get_digits_also_alphabetical(file_path: &str) -> Vec<Vec<u64>> {
@@ -40,7 +40,7 @@ fn get_digits_also_alphabetical(file_path: &str) -> Vec<Vec<u64>> {
         .expect("Should have been able to read the file");
 
     let vec_replace:Vec<String>= [
-        "0zero",
+        // "0zero",
         "1one",
         "2two",
         "3three",
@@ -57,13 +57,37 @@ fn get_digits_also_alphabetical(file_path: &str) -> Vec<Vec<u64>> {
         let mut digits: Vec<u64> = Vec::new();
         let mut lines:Vec<String> = Vec::new();
         lines.push(line.to_string());
-        for replace in vec_replace.iter() {
-            let tmp = &replace.clone();
-            let a = &tmp[0..1].to_string();
-            let b = &tmp[1..].to_string();
-            let line_new = lines[lines.len() - 1].replace(b, a);
-            lines.push(line_new);
+        let mut keepgoing = true;
+        while keepgoing {
+            keepgoing = false;
+            let mut index_find = 1000;
+            let mut index_number = 0;
+            let mut i = 0;
+
+            for replace in vec_replace.iter() {
+                let tmp = &replace.clone();
+                let _pattern = &tmp[1..].to_string();
+                match lines[lines.len() - 1].find(_pattern) {
+                    Some(index) => {
+                        if index < index_find {
+                            index_find = index;
+                            index_number = i;
+                            keepgoing = true;
+                        }
+                    },
+                    None => (),
+                }
+            }
+            if keepgoing {
+                println!("Now replacing {} at place {index_find}", index_number + 1);
+                let tmp = vec_replace[index_number].clone();
+                let _replace = &tmp[0..1].to_string();
+                let _pattern = &tmp[1..].to_string();
+                let line_new = lines[lines.len() - 1].replacen(_pattern, _replace, 1);
+                lines.push(line_new);
+            }
         }
+
         let line_new = lines[lines.len() - 1].clone();
         println!("line {line} is now {line_new}");
         for char in line_new.chars() {
