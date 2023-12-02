@@ -18,6 +18,15 @@ fn main() {
     let tmp =
         sum_vector(
             select_digits_to_create_numbers(
+                get_digits(file_path)));
+    println!("First Input: The sum of the numbers is {tmp}");
+    /*************************
+     * Second dummy
+     *************************/
+    let file_path = "inputs/01_dummy2.txt";
+    let tmp =
+        sum_vector(
+            select_digits_to_create_numbers(
                 get_digits_also_alphabetical(file_path)));
     println!("second dummy: The sum of the numbers is {tmp}");
     /*************************
@@ -77,19 +86,20 @@ fn get_digits_also_alphabetical(file_path: &str) -> Vec<Vec<u64>> {
                     },
                     None => (),
                 }
+                i += 1;
             }
             if keepgoing {
-                println!("Now replacing {} at place {index_find}", index_number + 1);
+                // println!("Now replacing {} at place {index_find}", index_number + 1);
                 let tmp = vec_replace[index_number].clone();
                 let _replace = &tmp[0..1].to_string();
-                let _pattern = &tmp[1..].to_string();
-                let line_new = lines[lines.len() - 1].replacen(_pattern, _replace, 1);
+                let mut line_new = lines[lines.len() - 1].clone();
+                line_new.replace_range(index_find..index_find+1, _replace);
                 lines.push(line_new);
             }
         }
 
         let line_new = lines[lines.len() - 1].clone();
-        println!("line {line} is now {line_new}");
+        // println!("line {line} is now {line_new}");
         for char in line_new.chars() {
             if char.is_numeric() {
                 digits.push(
