@@ -1,5 +1,4 @@
 use std::fs;
-use std::cmp;
 use std::collections::HashMap;
 
 fn main() {
@@ -7,21 +6,45 @@ fn main() {
     let vector_games = create_game_vec(file_path);
 
     println!(""); println!("");
-    let tmp = check_condition(vector_games,
+    let tmp = check_condition(vector_games.clone(),
                               HashMap::from([(0, 12), (1, 13), (2, 14)]));
     println!(""); println!("");
     println!("The indices of the valid games sum to {tmp}");
 
+    let tmp = check_condition2(vector_games);
+    println!("The sum of the power of the minimums is {tmp}");
 
+    //*
     let file_path = "inputs/02_first.txt";
     let vector_games = create_game_vec(file_path);
 
     println!(""); println!("");
-    let tmp = check_condition(vector_games,
+    let tmp = check_condition(vector_games.clone(),
                               HashMap::from([(0, 12), (1, 13), (2, 14)]));
     println!(""); println!("");
     println!("The indices of the valid games sum to {tmp}");
-                              
+    let tmp = check_condition2(vector_games);
+    println!("The sum of the power of the minimums is {tmp}");
+    // */
+}
+
+fn check_condition2(vector_games: HashMap<i32, Vec<Vec<u64>>>) -> u64 {
+    let mut sum:u64 = 0;
+    for (gameindex, subsets) in vector_games.iter() {
+        let mut minimum: Vec<u64> = vec![0, 0, 0];
+        for subset in subsets {
+            for (num_sub, num_min) in subset.iter().zip(minimum.iter_mut()) {
+                if *num_sub > *num_min {
+                    *num_min = *num_sub;
+                }
+            }
+        }
+        let tmp = minimum.iter().product::<u64>();
+        // println!("game {gameindex} has minima r{}, g{}, b{}; and power {tmp}",
+        //          minimum[0], minimum[1], minimum[2]);
+        sum += minimum.iter().product::<u64>();
+    }
+    return sum;
 }
 
 fn check_condition(vector_games: HashMap<i32, Vec<Vec<u64>>>,
@@ -51,7 +74,7 @@ fn create_game_vec(file_path: &str) -> HashMap<i32, Vec<Vec<u64>>> {
     // let mut vector_games:Vec<Vec<Vec<u64>>> = Vec::new();
     let mut vector_games = HashMap::new();
     for line in contents.lines() {
-        println!("{}", line);
+        // println!("{}", line);
         let mut line_rest = line;
         let mut gameindex:i32=-1;
         // find game index
@@ -76,7 +99,7 @@ fn create_game_vec(file_path: &str) -> HashMap<i32, Vec<Vec<u64>>> {
 }
 
 fn parse_subset(line: &str) -> Vec<u64> {
-    println!("trying to parse '{line}'");
+    // println!("trying to parse '{line}'");
     let mut subset:Vec<u64> = vec![0, 0, 0];
 
     let colours:HashMap<&str, usize> = HashMap::from([
@@ -94,7 +117,7 @@ fn parse_subset(line: &str) -> Vec<u64> {
                     // println!("{tmp}");
                     subset[*c_id] = tmp.parse::<u64>().expect("No conversion possible");
                     let tmp = subset[*c_id];
-                    println!("colour {c_name} found at {index} with value {tmp}");
+                    // println!("colour {c_name} found at {index} with value {tmp}");
                 },
                 None => (),
             }
