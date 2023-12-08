@@ -57,22 +57,17 @@ fn get_digits_also_alphabetical(file_path: &str) -> Vec<Vec<u64>> {
             keepgoing = false;
             let mut index_find = 1000;
             let mut index_number = 0;
-            let mut i = 0;
 
-            for replace in vec_replace.iter() {
+            for (i, replace) in vec_replace.iter().enumerate() {
                 let tmp = &replace.clone();
                 let _pattern = &tmp[1..].to_string();
-                match lines[lines.len() - 1].find(_pattern) {
-                    Some(index) => {
-                        if index < index_find {
-                            index_find = index;
-                            index_number = i;
-                            keepgoing = true;
-                        }
+                if let Some(index) = lines[lines.len() - 1].find(_pattern) {
+                    if index < index_find {
+                        index_find = index;
+                        index_number = i;
+                        keepgoing = true;
                     }
-                    None => (),
                 }
-                i += 1;
             }
             if keepgoing {
                 // println!("Now replacing {} at place {index_find}", index_number + 1);
@@ -97,7 +92,7 @@ fn get_digits_also_alphabetical(file_path: &str) -> Vec<Vec<u64>> {
         }
         vector_of_numerical_lines.push(digits);
     }
-    return vector_of_numerical_lines;
+    vector_of_numerical_lines
 }
 
 fn get_digits(file_path: &str) -> Vec<Vec<u64>> {
@@ -121,7 +116,7 @@ fn get_digits(file_path: &str) -> Vec<Vec<u64>> {
         }
         vector_of_numerical_lines.push(digits);
     }
-    return vector_of_numerical_lines;
+    vector_of_numerical_lines
 }
 
 fn select_digits_to_create_numbers(vector_of_numerical_lines: Vec<Vec<u64>>) -> Vec<u64> {
@@ -133,7 +128,7 @@ fn select_digits_to_create_numbers(vector_of_numerical_lines: Vec<Vec<u64>>) -> 
         let tmp = 10 * line_vec[0] + line_vec[line_vec.len() - 1];
         vector_of_numbers.push(tmp);
     }
-    return vector_of_numbers;
+    vector_of_numbers
 }
 
 fn sum_vector(vector_of_numbers: Vec<u64>) -> u64 {
@@ -145,5 +140,5 @@ fn sum_vector(vector_of_numbers: Vec<u64>) -> u64 {
         sum += number;
     }
 
-    return sum;
+    sum
 }

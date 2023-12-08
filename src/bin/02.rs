@@ -5,14 +5,14 @@ fn main() {
     let file_path = "inputs/02_dummy.txt";
     let vector_games = create_game_vec(file_path);
 
-    println!("");
-    println!("");
+    println!();
+    println!();
     let tmp = check_condition(
         vector_games.clone(),
         HashMap::from([(0, 12), (1, 13), (2, 14)]),
     );
-    println!("");
-    println!("");
+    println!();
+    println!();
     println!("The indices of the valid games sum to {tmp}");
 
     let tmp = check_condition2(vector_games);
@@ -22,14 +22,14 @@ fn main() {
     let file_path = "inputs/02_first.txt";
     let vector_games = create_game_vec(file_path);
 
-    println!("");
-    println!("");
+    println!();
+    println!();
     let tmp = check_condition(
         vector_games.clone(),
         HashMap::from([(0, 12), (1, 13), (2, 14)]),
     );
-    println!("");
-    println!("");
+    println!();
+    println!();
     println!("The indices of the valid games sum to {tmp}");
     let tmp = check_condition2(vector_games);
     println!("The sum of the power of the minimums is {tmp}");
@@ -38,7 +38,7 @@ fn main() {
 
 fn check_condition2(vector_games: HashMap<i32, Vec<Vec<u64>>>) -> u64 {
     let mut sum: u64 = 0;
-    for (gameindex, subsets) in vector_games.iter() {
+    for (_gameindex, subsets) in vector_games.iter() {
         let mut minimum: Vec<u64> = vec![0, 0, 0];
         for subset in subsets {
             for (num_sub, num_min) in subset.iter().zip(minimum.iter_mut()) {
@@ -47,12 +47,12 @@ fn check_condition2(vector_games: HashMap<i32, Vec<Vec<u64>>>) -> u64 {
                 }
             }
         }
-        let tmp = minimum.iter().product::<u64>();
-        // println!("game {gameindex} has minima r{}, g{}, b{}; and power {tmp}",
+        // let tmp = minimum.iter().product::<u64>();
+        // println!("game {_gameindex} has minima r{}, g{}, b{}; and power {tmp}",
         //          minimum[0], minimum[1], minimum[2]);
         sum += minimum.iter().product::<u64>();
     }
-    return sum;
+    sum
 }
 
 fn check_condition(
@@ -74,7 +74,7 @@ fn check_condition(
             println!("Game {gameindex} is valid");
         }
     }
-    return sum;
+    sum
 }
 
 fn create_game_vec(file_path: &str) -> HashMap<i32, Vec<Vec<u64>>> {
@@ -87,22 +87,19 @@ fn create_game_vec(file_path: &str) -> HashMap<i32, Vec<Vec<u64>>> {
         let mut line_rest = line;
         let mut gameindex: i32 = -1;
         // find game index
-        match line_rest.find(":") {
-            Some(index) => {
-                gameindex = line_rest[5..index]
-                    .parse::<i32>()
-                    .expect("No conversion possible");
-                line_rest = &line_rest[index + 2..];
-                // println!("found at {index} {gameindex};; {line_rest}");
-            }
-            None => (),
+        if let Some(index) = line_rest.find(':') {
+            gameindex = line_rest[5..index]
+                .parse::<i32>()
+                .expect("No conversion possible");
+            line_rest = &line_rest[index + 2..];
+            // println!("found at {index} {gameindex};; {line_rest}");
         }
         // find subsets
 
         vector_games.insert(gameindex, identify_subsets(line_rest));
     }
 
-    return vector_games;
+    vector_games
 }
 
 fn parse_subset(line: &str) -> Vec<u64> {
@@ -113,20 +110,17 @@ fn parse_subset(line: &str) -> Vec<u64> {
 
     for (c_name, c_id) in &colours {
         for substring in line.split(", ") {
-            match substring.find(c_name) {
-                Some(index) => {
-                    let tmp: Vec<&str> = line[0..index - 1].matches(char::is_numeric).collect();
-                    let tmp = &substring[0..index - 1];
-                    // println!("{tmp}");
-                    subset[*c_id] = tmp.parse::<u64>().expect("No conversion possible");
-                    let tmp = subset[*c_id];
-                    // println!("colour {c_name} found at {index} with value {tmp}");
-                }
-                None => (),
+            if let Some(index) = substring.find(c_name) {
+                // let tmp: Vec<&str> = line[0..index - 1].matches(char::is_numeric).collect();
+                let tmp = &substring[0..index - 1];
+                // println!("{tmp}");
+                subset[*c_id] = tmp.parse::<u64>().expect("No conversion possible");
+                // let tmp = subset[*c_id];
+                // println!("colour {c_name} found at {index} with value {tmp}");
             }
         }
     }
-    return subset;
+    subset
 }
 
 fn identify_subsets(line: &str) -> Vec<Vec<u64>> {
@@ -135,17 +129,14 @@ fn identify_subsets(line: &str) -> Vec<Vec<u64>> {
     let mut line_rest = line.to_string();
     while keepgoing {
         keepgoing = false;
-        match line_rest.find(";") {
-            Some(index) => {
-                vector_subsets.push(parse_subset(&line_rest[0..index]));
-                line_rest = line_rest[index + 2..].to_string();
-                // println!("found at {index} {gameindex};; {line_rest}");
-                keepgoing = true;
-            }
-            None => (),
+        if let Some(index) = line_rest.find(';') {
+            vector_subsets.push(parse_subset(&line_rest[0..index]));
+            line_rest = line_rest[index + 2..].to_string();
+            // println!("found at {index} {gameindex};; {line_rest}");
+            keepgoing = true;
         }
     }
     // also parse the last subset
     vector_subsets.push(parse_subset(&line_rest));
-    return vector_subsets;
+    vector_subsets
 }
