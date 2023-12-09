@@ -61,7 +61,8 @@ fn do_the_other_thing(file_path: &str) -> u64 {
                     let (start, end) = get_shifted_boundaries(m.start(), m.end(), line.len());
                     // println!("index gear {}, start&end {} {}", m_idx, start, end);
                     if start <= m_idx && end >= m_idx {
-                        vector_of_numbers.push(m.as_str().parse::<u64>().expect("No conversion possible"));
+                        vector_of_numbers
+                            .push(m.as_str().parse::<u64>().expect("No conversion possible"));
                         // println!("found number {}", &vector_of_numbers.last().unwrap());
                     }
                 }
@@ -73,7 +74,8 @@ fn do_the_other_thing(file_path: &str) -> u64 {
                     let (start, end) = get_shifted_boundaries(m.start(), m.end(), line.len());
                     // println!("index gear {}, start&end {} {}", m_idx, start, end);
                     if start <= m_idx && end >= m_idx {
-                        vector_of_numbers.push(m.as_str().parse::<u64>().expect("No conversion possible"));
+                        vector_of_numbers
+                            .push(m.as_str().parse::<u64>().expect("No conversion possible"));
                         // println!("found number {}", &vector_of_numbers.last().unwrap());
                     }
                 }
@@ -84,7 +86,8 @@ fn do_the_other_thing(file_path: &str) -> u64 {
                     let (start, end) = get_shifted_boundaries(m.start(), m.end(), line.len());
                     // println!("index gear {}, start&end {} {}", m_idx, start, end);
                     if start == m_idx || end == m_idx {
-                        vector_of_numbers.push(m.as_str().parse::<u64>().expect("No conversion possible"));
+                        vector_of_numbers
+                            .push(m.as_str().parse::<u64>().expect("No conversion possible"));
                         // println!("found number {}", &vector_of_numbers.last().unwrap());
                     }
                 }
@@ -95,13 +98,11 @@ fn do_the_other_thing(file_path: &str) -> u64 {
                 vector_of_ratios.push(vector_of_numbers.iter().product::<u64>());
                 // println!("exactly two numbers! added {}", &vector_of_ratios.last().unwrap());
             }
-
         }
     }
 
     vector_of_ratios.iter().sum::<u64>()
 }
-
 
 fn do_the_thing(file_path: &str) -> u64 {
     let contents = fs::read_to_string(file_path).expect("Should have been able to read the file");
