@@ -22,9 +22,7 @@ fn main() {
     let tmp = doit2(file_path);
     println!("Sum of values is {tmp}");
     assert_eq!(tmp, 1108);
-
 }
-
 
 fn doit2(file_path: &str) -> i32 {
     // get file input
@@ -36,9 +34,7 @@ fn doit2(file_path: &str) -> i32 {
     // collect sum
     list_of_predictions
         .iter()
-        .map(|list| list
-             .first()
-             .expect("no items"))
+        .map(|list| list.first().expect("no items"))
         .sum::<i32>()
 }
 
@@ -52,9 +48,7 @@ fn doit(file_path: &str) -> i32 {
     // collect sum
     list_of_predictions
         .iter()
-        .map(|list| list
-             .last()
-             .expect("no items"))
+        .map(|list| list.last().expect("no items"))
         .sum::<i32>()
 }
 
@@ -64,16 +58,15 @@ fn process_file(file_path: &str) -> Vec<Vec<i32>> {
     for line in contents.lines() {
         // println!("Processing line '{line}'");
         list_of_inputs.push(
-            line
-            .split(' ')
-            .filter(|s| !s.is_empty())
-            .map(|s| {
-                // println!("{s}");
-                s.to_string()
-                    .parse::<i32>()
-                    .expect("no conversion possible")
-            })
-            .collect::<Vec<i32>>()
+            line.split(' ')
+                .filter(|s| !s.is_empty())
+                .map(|s| {
+                    // println!("{s}");
+                    s.to_string()
+                        .parse::<i32>()
+                        .expect("no conversion possible")
+                })
+                .collect::<Vec<i32>>(),
         );
     }
 
@@ -112,11 +105,10 @@ fn differentiate(list_of_inputs: Vec<Vec<i32>>) -> Vec<Vec<Vec<i32>>> {
 fn predict(list_of_list_of_differences: Vec<Vec<Vec<i32>>>) -> Vec<Vec<i32>> {
     let mut list_of_predictions: Vec<Vec<i32>> = Vec::new();
     for differences in list_of_list_of_differences.iter() {
-        let mut last_value:i32 = 0;
+        let mut last_value: i32 = 0;
         for i in (0..differences.len() - 1).rev() {
             // print!("{}, {}; ", last_value, differences[i].last().expect("No last value"));
             last_value = last_value + differences[i].last().expect("No last value");
-
         }
         let mut tmp = differences[0].clone();
         tmp.push(last_value);
@@ -129,11 +121,10 @@ fn predict(list_of_list_of_differences: Vec<Vec<Vec<i32>>>) -> Vec<Vec<i32>> {
 fn predict_backwards(list_of_list_of_differences: Vec<Vec<Vec<i32>>>) -> Vec<Vec<i32>> {
     let mut list_of_predictions: Vec<Vec<i32>> = Vec::new();
     for differences in list_of_list_of_differences.iter() {
-        let mut last_value:i32 = 0;
+        let mut last_value: i32 = 0;
         for i in (0..differences.len() - 1).rev() {
             // println!("{}, {}; ", last_value, differences[i].first().expect("No first value"));
             last_value = differences[i].first().expect("No first value") - last_value;
-
         }
         let mut tmp = differences[0].clone();
         tmp.insert(0, last_value);
