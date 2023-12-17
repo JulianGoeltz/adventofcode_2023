@@ -10,22 +10,26 @@ fn main() {
     let file_path = "inputs/10_dummy1.txt";
     let tmp = ring_half_length(&doit(file_path));
     println!("half ringlength is {tmp}");
-    assert_eq!(tmp, 4); // */
-                        //*
+    assert_eq!(tmp, 4);
+    // */
+    //*
     let file_path = "inputs/10_dummy2.txt";
     let tmp = ring_half_length(&doit(file_path));
     println!("half ringlength is {tmp}");
-    assert_eq!(tmp, 4); // */
-                        //*
+    assert_eq!(tmp, 4);
+    // */
+    //*
     let file_path = "inputs/10_dummy3.txt";
     let tmp = ring_half_length(&doit(file_path));
     println!("half ringlength is {tmp}");
-    assert_eq!(tmp, 8); // */
-                        //*
+    assert_eq!(tmp, 8);
+    // */
+    //*
     let file_path = "inputs/10_input.txt";
     let tmp = ring_half_length(&doit(file_path));
     println!("half ringlength is {tmp}");
-    assert_eq!(tmp, 6640); // */
+    assert_eq!(tmp, 6640);
+    // */
     // part 2
     for (file_path, correct_area) in vec![
         ("inputs/10_dummy1.txt", 1),
