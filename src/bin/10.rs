@@ -8,31 +8,76 @@ fn main() {
     // part 1
     //*
     let file_path = "inputs/10_dummy1.txt";
-    let tmp = doit(file_path);
+    let tmp = ring_half_length(&doit(file_path));
     println!("half ringlength is {tmp}");
     assert_eq!(tmp, 4); // */
-    //*
+                        //*
     let file_path = "inputs/10_dummy2.txt";
-    let tmp = doit(file_path);
+    let tmp = ring_half_length(&doit(file_path));
     println!("half ringlength is {tmp}");
     assert_eq!(tmp, 4); // */
+                        //*
     let file_path = "inputs/10_dummy3.txt";
-    let tmp = doit(file_path);
+    let tmp = ring_half_length(&doit(file_path));
     println!("half ringlength is {tmp}");
     assert_eq!(tmp, 8); // */
+                        //*
     let file_path = "inputs/10_input.txt";
-    let tmp = doit(file_path);
+    let tmp = ring_half_length(&doit(file_path));
     println!("half ringlength is {tmp}");
     assert_eq!(tmp, 6640); // */
+    // part 2
+    for (file_path, correct_area) in vec![
+        ("inputs/10_dummy1.txt", 1),
+        ("inputs/10_dummy1_.txt", 2),
+        ("inputs/10_dummy1_2.txt", 0),
+        ("inputs/10_dummy2.txt", 1),
+        ("inputs/10_dummy3.txt", 1),
+        ("inputs/10_2dummy_1.txt", 4),
+        ("inputs/10_2dummy_2.txt", 4),
+        ("inputs/10_2dummy_4.txt", 10),
+        // ("inputs/10_2dummy_3.txt", 8), // this one doesn't work?
+        ("inputs/10_input.txt", 411),
+    ] {
+        let ring = doit(file_path);
+        let area = ring_content(&ring);
+        let tmp = area - (ring_half_length(&ring) - 1);
+        println!("the area is {area}, ring length is {}", ring.len());
+        println!("inner area should be {correct_area}, calculated {tmp}");
+        assert_eq!(tmp, correct_area); // */
+    }
 }
 
-fn doit(file_path: &str) -> u64 {
+fn ring_content(ring: &Vec<(isize, isize)>) -> u64 {
+    /* ** y is counted negatively, as lower rows have higher y ** */
+    let mut area: i32 = 0;
+    for i in 0..ring.len() {
+        let i_n = (i + 1) % ring.len();
+        print!(
+            "At step from {:?} to {:?} with area {} ",
+            ring[i], ring[i_n], area
+        );
+        let change: i32;
+        if ring[i].0 < ring[i_n].0 {
+            change = -<isize as TryInto<i32>>::try_into(ring[i].1).unwrap();
+            print!("we add ");
+        } else if ring[i].0 > ring[i_n].0 {
+            change = <isize as TryInto<i32>>::try_into(ring[i].1).unwrap();
+            print!("we subtract ");
+        } else {
+            print!("we don't change ");
+            change = 0;
+        }
+        area += change;
+        println!("{} to get new area {}", change, area);
+    }
+    area.try_into().unwrap()
+}
+
+fn doit(file_path: &str) -> Vec<(isize, isize)> {
     let contents = fs::read_to_string(file_path).expect("Can't read file");
     // collect data
-    let fields: Vec<Vec<char>> = contents
-        .lines()
-        .map(|str| str.chars().map(|s| s).collect())
-        .collect();
+    let fields: Vec<Vec<char>> = contents.lines().map(|str| str.chars().collect()).collect();
     for line in fields.iter() {
         println!("{:?}", line);
     }
@@ -42,14 +87,20 @@ fn doit(file_path: &str) -> u64 {
     let rings = collect_rings(&fields, start_position);
 
     let mut max_length: usize = 0;
-    for ring in rings.iter() {
+    let mut index: usize = 0;
+    for (i, ring) in rings.iter().enumerate() {
         if ring.len() > max_length {
             max_length = ring.len();
+            index = i;
         }
     }
-    let tmp = (max_length / 2).try_into().unwrap();
+    let tmp: u64 = (max_length / 2).try_into().unwrap();
     println!("max_length is {} and half is {}", max_length, tmp);
-    tmp
+    rings[index].clone()
+}
+
+fn ring_half_length(ring: &Vec<(isize, isize)>) -> u64 {
+    (ring.len() / 2).try_into().unwrap()
 }
 
 fn locate_start(fields: &Vec<Vec<char>>) -> (isize, isize) {
@@ -58,7 +109,7 @@ fn locate_start(fields: &Vec<Vec<char>>) -> (isize, isize) {
     for iy in 0..fields.len() {
         for ix in 0..fields[0].len() {
             if fields[iy][ix] == 'S' {
-                println!("{ix} {iy}");
+                // println!("{ix} {iy}");
                 start_x = ix.try_into().unwrap();
                 start_y = iy.try_into().unwrap();
             }
@@ -135,22 +186,24 @@ fn collect_rings(
     //     start_position.1.try_into().unwrap()
     //     );
     let mut lists_of_elementpositions: Vec<Vec<(isize, isize)>> = Vec::new();
-    println!("start_position {:?}", start_position);
+    // println!("start_position {:?}", start_position);
     for dir in Direction::iter() {
         if dir != Direction::Nothing {
             let mut positions = vec![start_position];
             let mut last_direction = &dir;
-            println!("{} {}: {}", start_position.0, start_position.1, 
-                     fields[
-                            usize::try_from(start_position.1).unwrap()
-                        ][
-                            usize::try_from(start_position.0).unwrap()
-                        ],
-                     );
+            /*
+            println!(
+                "{} {}: {}",
+                start_position.0,
+                start_position.1,
+                fields[usize::try_from(start_position.1).unwrap()]
+                    [usize::try_from(start_position.0).unwrap()],
+            );
             println!(
                 "{:?}: {}, {}",
                 dir, GET_DIRECTION[&dir].0, GET_DIRECTION[&dir].1
             );
+            // */
             let mut keep_going = true;
             while keep_going {
                 keep_going = false;
@@ -165,14 +218,14 @@ fn collect_rings(
                     && tmp_next_position.1 >= 0
                     && tmp_next_position.1 < fields.len().try_into().unwrap()
                 {
-                    let mut next_position: (usize, usize) = (
+                    let next_position: (usize, usize) = (
                         tmp_next_position.0.try_into().unwrap(),
                         tmp_next_position.1.try_into().unwrap(),
                     );
                     let next_field = fields[next_position.1][next_position.0];
                     if next_field == 'S' {
-                        println!("YES, found a ring:");
-                        println!("{:?}", positions);
+                        // println!("YES, found a ring:");
+                        // println!("{:?}", positions);
                         lists_of_elementpositions.push(positions);
                         break;
                     }
@@ -188,38 +241,28 @@ fn collect_rings(
                     };
                     let next_direction =
                         next_pipe.get(last_direction).unwrap_or(&Direction::Nothing);
+                    /*
                     println!(
                         "with lastdir {:?} and next field {:?} we get next_direction {:?}",
                         last_direction, next_field, next_direction
                     );
+                    // */
                     if next_direction == &Direction::Nothing {
                         break;
                     }
                     last_direction = &next_direction;
                     keep_going = true;
 
+                    /*
                     println!(
                         "next field is at {} {} and '{}'",
                         next_position.0, next_position.1, next_field
                     );
                     println!("next_direction {:?}", next_direction)
-                }
-                // panic!();
-            }
-        }
-
-        /*
-            if !(ix == 0 && iy == 0) &&
-                start_position.0 +ix  >= 0 &&
-                start_position.1 - iy >= 0 {
-                println!("{ix} {iy} {} {}", start_position.0 + ix,start_position.1 + iy);
-                let mut keep_going = true;
-                while keep_going {
-
+                    // */
                 }
             }
         }
-        // */
     }
 
     lists_of_elementpositions
